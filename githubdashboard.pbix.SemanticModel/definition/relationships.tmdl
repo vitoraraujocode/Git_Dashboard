@@ -1,0 +1,23 @@
+relationship b2fec0fb-084a-4244-abb0-d1583b70d7cf
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Git.created_at
+	toColumn: LocalDateTable_388ee7de-bf5d-4913-9698-2020a51b47b1.Date
+
+relationship 932da8fb-ad95-4cd2-a374-4d1eded93a56
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Git.updated_at
+	toColumn: LocalDateTable_eb7474cb-8bf4-4aef-a0d9-20aff777e525.Date
+
+relationship cf8c4efa-b980-4fd0-9b08-fa026fc4e8e9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Git.pushed_at
+	toColumn: LocalDateTable_e79da5c1-d43c-461b-8e84-39fede2da3eb.Date
+
+relationship a2656fc2-65c9-a187-5daa-b9b378900306
+	fromColumn: Commits.id_repositorio
+	toColumn: Git.id
+
+relationship c302143d-d598-75bf-1396-b981e47aab0f
+	fromColumn: Languages.id_repositorio
+	toColumn: Git.id
+

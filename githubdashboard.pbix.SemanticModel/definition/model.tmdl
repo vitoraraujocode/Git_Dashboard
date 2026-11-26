@@ -1,0 +1,26 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-BR
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Git","Commits","Languages"]
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table Git
+ref table DateTableTemplate_3a07b64d-5875-4292-ac9c-f136f1558f88
+ref table LocalDateTable_388ee7de-bf5d-4913-9698-2020a51b47b1
+ref table LocalDateTable_eb7474cb-8bf4-4aef-a0d9-20aff777e525
+ref table LocalDateTable_e79da5c1-d43c-461b-8e84-39fede2da3eb
+ref table Commits
+ref table Languages
+ref table _Medidas
+
+ref cultureInfo pt-BR
+

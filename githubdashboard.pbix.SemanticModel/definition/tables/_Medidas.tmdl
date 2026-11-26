@@ -1,0 +1,112 @@
+/// Tabela de medidas (HTML Content)
+table _Medidas
+	lineageTag: d9456e47-b707-4542-9721-057d0c2b52fa
+
+	/// 3 cartões em HTML: total de commits, linguagens distintas e repositórios. Responde ao filtro Commits[Ano].
+	measure 'HTML Cartões' =
+			VAR _commits = COUNTROWS(Commits)
+			VAR _repos = FILTER(Git, NOT ISFILTERED(Commits[Ano]) || CALCULATE(COUNTROWS(Commits)) > 0)
+			VAR _nRepos = COUNTROWS(_repos)
+			VAR _ids = SELECTCOLUMNS(_repos, "id", Git[id])
+			VAR _nLang = COUNTROWS(DISTINCT(SELECTCOLUMNS(FILTER(Languages, NOT ISBLANK(Languages[linguagem]) && CONTAINSROW(_ids, VALUE(Languages[id_repositorio]))), "l", Languages[linguagem])))
+			VAR _c = "flex:1 1 0;min-width:0;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:16px 8px;text-align:center;"
+			VAR _t = "font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+			VAR _v = "font-size:34px;font-weight:700;line-height:1.1;margin-top:8px;"
+			VAR _b = "height:3px;border-radius:3px;margin:12px auto 0;width:40%;opacity:0.75;"
+			RETURN
+			"<div style='display:flex;gap:12px;width:100%;box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;'>"
+			& "<div style='" & _c & "'><div style='" & _t & "'>Commits</div><div style='" & _v & "color:#22d3ee;text-shadow:0 0 14px rgba(34,211,238,0.45);'>" & FORMAT(_commits, "#,0") & "</div><div style='" & _b & "background:#22d3ee;'></div></div>"
+			& "<div style='" & _c & "'><div style='" & _t & "'>Linguagens</div><div style='" & _v & "color:#a78bfa;text-shadow:0 0 14px rgba(167,139,250,0.45);'>" & FORMAT(_nLang, "#,0") & "</div><div style='" & _b & "background:#a78bfa;'></div></div>"
+			& "<div style='" & _c & "'><div style='" & _t & "'>Repositórios</div><div style='" & _v & "color:#f472b6;text-shadow:0 0 14px rgba(244,114,182,0.45);'>" & FORMAT(_nRepos, "#,0") & "</div><div style='" & _b & "background:#f472b6;'></div></div>"
+			& "</div>"
+		lineageTag: b12c0525-7296-4166-9620-c89eb239a695
+
+	/// Gráfico de barras em HTML com os 10 repositórios com mais commits. Responde ao filtro Commits[Ano].
+	measure 'HTML Top Repositórios' =
+			VAR _base = ADDCOLUMNS(SUMMARIZE(Git, Git[id], Git[name]), "@n", CALCULATE(COUNTROWS(Commits)))
+			VAR _top = TOPN(10, FILTER(_base, [@n] > 0), [@n], DESC, Git[name], ASC)
+			VAR _max = MAXX(_top, [@n])
+			VAR _linhas =
+			    CONCATENATEX(
+			        _top,
+			        VAR _nome = SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Git[name], "&", "&amp;"), "<", "&lt;"), ">", "&gt;")
+			        RETURN
+			        "<div style='display:flex;align-items:center;gap:8px;margin:6px 0;'>"
+			        & "<div title='" & _nome & "' style='flex:0 0 32%;min-width:0;font-size:12px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" & _nome & "</div>"
+			        & "<div style='flex:1 1 0;min-width:0;background:rgba(255,255,255,0.08);border-radius:6px;height:14px;'><div style='width:" & ROUND(DIVIDE([@n], _max) * 100, 0) & "%;height:14px;border-radius:6px;background:linear-gradient(90deg,#22d3ee,#a78bfa);box-shadow:0 0 10px rgba(34,211,238,0.35);'></div></div>"
+			        & "<div style='flex:0 0 28px;font-size:12px;font-weight:600;color:#f8fafc;text-align:right;'>" & [@n] & "</div></div>",
+			        "",
+			        [@n], DESC,
+			        Git[name], ASC
+			    )
+			RETURN
+			IF(
+			    ISBLANK(_max),
+			    "<div style='font-family:Segoe UI,Arial,sans-serif;color:#94a3b8;padding:12px;'>Sem dados para o período selecionado</div>",
+			    "<div style='width:100%;box-sizing:border-box;overflow:hidden;padding:6px 4px;font-family:Segoe UI,Arial,sans-serif;'>"
+			    & "<div style='font-size:14px;font-weight:600;color:#f8fafc;letter-spacing:0.3px;margin-bottom:6px;'>Repositórios com mais commits</div>"
+			    & _linhas & "</div>"
+			)
+		lineageTag: ea69c229-cacd-4af4-8f25-d1f5a6125197
+
+	/// Gráfico de pizza em HTML (conic-gradient) com as linguagens mais usadas, em nº de repositórios por linguagem. Responde ao filtro Commits[Ano].
+	measure 'HTML Pizza Linguagens' =
+			VAR _repos = FILTER(Git, NOT ISFILTERED(Commits[Ano]) || CALCULATE(COUNTROWS(Commits)) > 0)
+			VAR _ids = SELECTCOLUMNS(_repos, "id", Git[id])
+			VAR _pares = SUMMARIZE(FILTER(Languages, NOT ISBLANK(Languages[linguagem]) && CONTAINSROW(_ids, VALUE(Languages[id_repositorio]))), Languages[id_repositorio], Languages[linguagem])
+			VAR _langs = ADDCOLUMNS(DISTINCT(SELECTCOLUMNS(_pares, "@lang", Languages[linguagem])), "@n", COUNTROWS(FILTER(_pares, Languages[linguagem] = [@lang])))
+			VAR _total = SUMX(_langs, [@n])
+			VAR _rk =
+			    ADDCOLUMNS(
+			        _langs,
+			        "@r", VAR _n = [@n] VAR _l = [@lang] RETURN COUNTROWS(FILTER(_langs, [@n] > _n || ([@n] = _n && [@lang] <= _l)))
+			    )
+			VAR _cor =
+			    ADDCOLUMNS(
+			        _rk,
+			        "@cor", SWITCH([@r], 1, "#22d3ee", 2, "#a78bfa", 3, "#f472b6", 4, "#60a5fa", 5, "#2dd4bf", 6, "#fbbf24", 7, "#fb7185", 8, "#818cf8", 9, "#34d399", 10, "#94a3b8", "#64748b")
+			    )
+			VAR _fat =
+			    ADDCOLUMNS(
+			        _cor,
+			        "@ini", VAR _r = [@r] RETURN SUMX(FILTER(_cor, [@r] < _r), [@n]) + 0
+			    )
+			VAR _fatias =
+			    CONCATENATEX(
+			        _fat,
+			        [@cor] & " " & SUBSTITUTE(FORMAT(DIVIDE([@ini], _total) * 100, "0.00"), ",", ".") & "% " & SUBSTITUTE(FORMAT(DIVIDE([@ini] + [@n], _total) * 100, "0.00"), ",", ".") & "%",
+			        ", ",
+			        [@r], ASC
+			    )
+			VAR _legenda =
+			    CONCATENATEX(
+			        _fat,
+			        "<div style='display:flex;align-items:center;margin:3px 0;font-size:12px;color:#cbd5e1;'><span style='flex:0 0 10px;width:10px;height:10px;border-radius:3px;background:" & [@cor] & ";margin-right:8px;'></span><span style='flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" & SUBSTITUTE(SUBSTITUTE(SUBSTITUTE([@lang], "&", "&amp;"), "<", "&lt;"), ">", "&gt;") & "</span><span style='flex:0 0 auto;font-weight:600;margin-left:8px;color:#f8fafc;'>" & [@n] & " (" & ROUND(DIVIDE([@n], _total) * 100, 0) & "%)</span></div>",
+			        "",
+			        [@r], ASC
+			    )
+			RETURN
+			IF(
+			    _total = 0,
+			    "<div style='font-family:Segoe UI,Arial,sans-serif;color:#94a3b8;padding:12px;'>Sem dados para o período selecionado</div>",
+			    "<div style='width:100%;box-sizing:border-box;overflow:hidden;padding:6px 4px;font-family:Segoe UI,Arial,sans-serif;'>"
+			    & "<div style='font-size:14px;font-weight:600;color:#f8fafc;letter-spacing:0.3px;'>Linguagens mais usadas</div>"
+			    & "<div style='font-size:11px;color:#94a3b8;margin:2px 0 12px;'>repositórios por linguagem</div>"
+			    & "<div style='display:flex;align-items:center;gap:16px;'>"
+			    & "<div style='flex:0 0 auto;width:36%;max-width:170px;min-width:80px;aspect-ratio:1/1;border-radius:50%;background:conic-gradient(" & _fatias & ");box-shadow:0 0 24px rgba(167,139,250,0.25);'></div>"
+			    & "<div style='flex:1 1 0;min-width:0;'>" & _legenda & "</div></div></div>"
+			)
+		lineageTag: fd5f028f-779a-4086-8ab3-78d46c9a828a
+
+	measure 'HTML Medidas Anos' = VAR _total = COUNTROWS(Commits) VAR _minI = MINX(Commits, Commits[Ano] * 12 + VALUE(MID(Commits[data], 6, 2)) - 1) VAR _maxI = MAXX(Commits, Commits[Ano] * 12 + VALUE(MID(Commits[data], 6, 2)) - 1) VAR _serie = ADDCOLUMNS(GENERATESERIES(_minI, _maxI), "@n", VAR _i = [Value] RETURN COUNTROWS(FILTER(Commits, Commits[Ano] * 12 + VALUE(MID(Commits[data], 6, 2)) - 1 = _i)), "@mes", SWITCH(MOD([Value], 12) + 1, 1, "jan", 2, "fev", 3, "mar", 4, "abr", 5, "mai", 6, "jun", 7, "jul", 8, "ago", 9, "set", 10, "out", 11, "nov", 12, "dez"), "@ano", FORMAT(MOD(INT([Value] / 12), 100), "00")) VAR _max = MAXX(_serie, [@n]) VAR _melhor = TOPN(1, _serie, [@n], DESC, [Value], ASC) VAR _melhorTxt = MAXX(_melhor, [@mes] & "/" & [@ano]) & " (" & _max & " commits)" VAR _cols = CONCATENATEX(_serie, VAR _n = [@n] VAR _h = IF(_n = 0, 2, MAX(3, ROUND(DIVIDE(_n, _max) * 115, 0))) VAR _fundo = IF(_n = 0, "rgba(255,255,255,0.15)", IF(_n = _max, "linear-gradient(180deg,#f472b6,#a78bfa)", "linear-gradient(180deg,#22d3ee,#60a5fa)")) RETURN "<div style='flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;'>" & "<div style='font-size:10px;line-height:14px;height:14px;color:#cbd5e1;'>" & IF(_n = 0, "", _n) & "</div>" & "<div style='width:70%;max-width:22px;height:" & _h & "px;border-radius:4px 4px 0 0;background:" & _fundo & ";'></div>" & "<div style='font-size:9px;line-height:1.15;color:#94a3b8;margin-top:4px;text-align:center;white-space:nowrap;overflow:hidden;max-width:100%;'>" & [@mes] & "<br>" & [@ano] & "</div></div>", "", [Value], ASC) RETURN IF(_total = 0, "<div style='font-family:Segoe UI,Arial,sans-serif;color:#94a3b8;padding:12px;'>Sem dados para o período selecionado</div>", "<div style='width:100%;box-sizing:border-box;overflow:hidden;padding:6px 4px;font-family:Segoe UI,Arial,sans-serif;'>" & "<div style='font-size:14px;font-weight:600;color:#f8fafc;letter-spacing:0.3px;'>Commits por mês</div>" & "<div style='font-size:11px;color:#94a3b8;margin:2px 0 12px;'>Mês com mais commits: <span style='color:#f472b6;font-weight:600;'>" & _melhorTxt & "</span></div>" & "<div style='display:flex;align-items:flex-end;gap:3px;'>" & _cols & "</div></div>")
+		lineageTag: d1198e3d-798c-4417-bfff-64e49ad6aa59
+
+	column Coluna
+		lineageTag: 1d3af717-205a-4bf2-bc20-906bbd8ad67f
+		isNameInferred
+		sourceColumn: [Coluna]
+
+	partition _Medidas = calculated
+		mode: import
+		source = ROW("Coluna", 1)
+

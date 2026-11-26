@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "githubdashboard.pbix"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c03c2bf2-c730-4b71-975a-b24b612eeb13"
+  }
+}

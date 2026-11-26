@@ -1,0 +1,83 @@
+table Languages
+	lineageTag: da9b03f4-9610-4efa-afcb-8682fd471c33
+
+	column id_repositorio
+		dataType: string
+		lineageTag: 2e3baf5d-1244-49e7-afe0-0bc6c5e23871
+		summarizeBy: none
+		sourceColumn: id_repositorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column linguagem
+		dataType: string
+		lineageTag: 62fac39a-1b70-415a-9dbd-b7b87a9aac99
+		summarizeBy: none
+		sourceColumn: linguagem
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Languages = m
+		mode: import
+		source =
+				let
+				    Fonte = Git,
+				
+				    BuscarLinguagens = Table.AddColumn(
+				        Fonte,
+				        "DadosLinguagens",
+				        each
+				            let
+				                IdRepositorio = [id],
+				                NomeRepositorio = [name],
+				
+				                Resposta = Json.Document(
+				                    Web.Contents(
+				                        "https://api.github.com",
+				                        [
+				                            RelativePath =
+				                                "repos/vitoraraujocode/"
+				                                & NomeRepositorio
+				                                & "/languages"
+				                        ]
+				                    )
+				                ),
+				
+				                ListaLinguagens = Record.FieldNames(Resposta),
+				
+				                Tabela = Table.FromList(
+				                    ListaLinguagens,
+				                    Splitter.SplitByNothing(),
+				                    {"linguagem"}
+				                ),
+				
+				                AdicionarID = Table.AddColumn(
+				                    Tabela,
+				                    "id_repositorio",
+				                    each IdRepositorio,
+				                    Int64.Type
+				                )
+				            in
+				                AdicionarID
+				    ),
+				
+				    Expandir = Table.ExpandTableColumn(
+				        BuscarLinguagens,
+				        "DadosLinguagens",
+				        {"id_repositorio", "linguagem"},
+				        {"id_repositorio", "linguagem"}
+				    ),
+				
+				    Resultado = Table.SelectColumns(
+				        Expandir,
+				        {"id_repositorio", "linguagem"}
+				    )
+				in
+				    Resultado
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

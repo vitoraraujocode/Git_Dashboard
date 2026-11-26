@@ -1,0 +1,125 @@
+table Git
+	lineageTag: bbc509f2-9a90-4280-8252-123c8d106415
+
+	column id
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d1df20d-3c3d-4d65-a53e-9971143d3c2d
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: c44a409f-8331-42f8-9b96-6855d0cefb75
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column full_name
+		dataType: string
+		lineageTag: 520d83ea-9057-4a94-91cb-b7cd8bc47e55
+		summarizeBy: none
+		sourceColumn: full_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column html_url
+		dataType: string
+		lineageTag: 59f39bee-818c-457a-b4e8-94edc93774ee
+		summarizeBy: none
+		sourceColumn: html_url
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 593cab86-f6a6-4e22-ade8-b0acc62b23e4
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variação
+			isDefault
+			relationship: b2fec0fb-084a-4244-abb0-d1583b70d7cf
+			defaultHierarchy: LocalDateTable_388ee7de-bf5d-4913-9698-2020a51b47b1.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 85917942-e4fc-4fad-84a0-e90622f3c4ae
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		variation Variação
+			isDefault
+			relationship: 932da8fb-ad95-4cd2-a374-4d1eded93a56
+			defaultHierarchy: LocalDateTable_eb7474cb-8bf4-4aef-a0d9-20aff777e525.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column pushed_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 165013b1-e4b6-4b0b-8048-2748baf15192
+		summarizeBy: none
+		sourceColumn: pushed_at
+
+		variation Variação
+			isDefault
+			relationship: cf8c4efa-b980-4fd0-9b08-fa026fc4e8e9
+			defaultHierarchy: LocalDateTable_e79da5c1-d43c-461b-8e84-39fede2da3eb.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column homepage
+		dataType: string
+		lineageTag: b601d280-ee2d-4c84-aa7b-3bddc9311415
+		summarizeBy: none
+		sourceColumn: homepage
+
+		annotation SummarizationSetBy = Automatic
+
+	column size
+		dataType: int64
+		formatString: 0
+		lineageTag: ad888592-93a5-4371-8ff0-2837332f947b
+		summarizeBy: sum
+		sourceColumn: size
+
+		annotation SummarizationSetBy = Automatic
+
+	column language
+		dataType: string
+		lineageTag: 6ab4134d-8159-43fa-b613-6ebe699a6f09
+		summarizeBy: none
+		sourceColumn: language
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Git = m
+		mode: import
+		source =
+				let
+				    Fonte = Json.Document(Web.Contents("https://api.github.com/users/vitoraraujocode/repos?per_page=100&")),
+				    #"Convertido para Tabela" = Table.FromList(Fonte, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    #"Column1 Expandido" = Table.ExpandRecordColumn(#"Convertido para Tabela", "Column1", {"id", "node_id", "name", "full_name", "private", "owner", "html_url", "description", "fork", "url", "forks_url", "keys_url", "collaborators_url", "teams_url", "hooks_url", "issue_events_url", "events_url", "assignees_url", "branches_url", "tags_url", "blobs_url", "git_tags_url", "git_refs_url", "trees_url", "statuses_url", "languages_url", "stargazers_url", "contributors_url", "subscribers_url", "subscription_url", "commits_url", "git_commits_url", "comments_url", "issue_comment_url", "contents_url", "compare_url", "merges_url", "archive_url", "downloads_url", "issues_url", "pulls_url", "milestones_url", "notifications_url", "labels_url", "releases_url", "deployments_url", "created_at", "updated_at", "pushed_at", "git_url", "ssh_url", "clone_url", "svn_url", "homepage", "size", "stargazers_count", "watchers_count", "language", "has_issues", "has_projects", "has_downloads", "has_wiki", "has_pages", "has_discussions", "forks_count", "mirror_url", "archived", "disabled", "open_issues_count", "license", "allow_forking", "is_template", "web_commit_signoff_required", "has_pull_requests", "pull_request_creation_policy", "topics", "visibility", "forks", "open_issues", "watchers", "default_branch"}, {"id", "node_id", "name", "full_name", "private", "owner", "html_url", "description", "fork", "url", "forks_url", "keys_url", "collaborators_url", "teams_url", "hooks_url", "issue_events_url", "events_url", "assignees_url", "branches_url", "tags_url", "blobs_url", "git_tags_url", "git_refs_url", "trees_url", "statuses_url", "languages_url", "stargazers_url", "contributors_url", "subscribers_url", "subscription_url", "commits_url", "git_commits_url", "comments_url", "issue_comment_url", "contents_url", "compare_url", "merges_url", "archive_url", "downloads_url", "issues_url", "pulls_url", "milestones_url", "notifications_url", "labels_url", "releases_url", "deployments_url", "created_at", "updated_at", "pushed_at", "git_url", "ssh_url", "clone_url", "svn_url", "homepage", "size", "stargazers_count", "watchers_count", "language", "has_issues", "has_projects", "has_downloads", "has_wiki", "has_pages", "has_discussions", "forks_count", "mirror_url", "archived", "disabled", "open_issues_count", "license", "allow_forking", "is_template", "web_commit_signoff_required", "has_pull_requests", "pull_request_creation_policy", "topics", "visibility", "forks", "open_issues", "watchers", "default_branch"}),
+				    #"owner Expandido" = Table.ExpandRecordColumn(#"Column1 Expandido", "owner", {"login", "id", "node_id", "avatar_url", "gravatar_id", "url", "html_url", "followers_url", "following_url", "gists_url", "starred_url", "subscriptions_url", "organizations_url", "repos_url", "events_url", "received_events_url", "type", "user_view_type", "site_admin"}, {"owner.login", "owner.id", "owner.node_id", "owner.avatar_url", "owner.gravatar_id", "owner.url", "owner.html_url", "owner.followers_url", "owner.following_url", "owner.gists_url", "owner.starred_url", "owner.subscriptions_url", "owner.organizations_url", "owner.repos_url", "owner.events_url", "owner.received_events_url", "owner.type", "owner.user_view_type", "owner.site_admin"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"owner Expandido",{{"id", Int64.Type}, {"node_id", type text}, {"name", type text}, {"full_name", type text}, {"private", type logical}, {"owner.login", type text}, {"owner.id", Int64.Type}, {"owner.node_id", type text}, {"owner.avatar_url", type text}, {"owner.gravatar_id", type any}, {"owner.url", type text}, {"owner.html_url", type text}, {"owner.followers_url", type text}, {"owner.following_url", type text}, {"owner.gists_url", type text}, {"owner.starred_url", type text}, {"owner.subscriptions_url", type text}, {"owner.organizations_url", type text}, {"owner.repos_url", type text}, {"owner.events_url", type text}, {"owner.received_events_url", type text}, {"owner.type", type text}, {"owner.user_view_type", type text}, {"owner.site_admin", type logical}, {"html_url", type text}, {"description", type text}, {"fork", type logical}, {"url", type text}, {"forks_url", type text}, {"keys_url", type text}, {"collaborators_url", type text}, {"teams_url", type text}, {"hooks_url", type text}, {"issue_events_url", type text}, {"events_url", type text}, {"assignees_url", type text}, {"branches_url", type text}, {"tags_url", type text}, {"blobs_url", type text}, {"git_tags_url", type text}, {"git_refs_url", type text}, {"trees_url", type text}, {"statuses_url", type text}, {"languages_url", type text}, {"stargazers_url", type text}, {"contributors_url", type text}, {"subscribers_url", type text}, {"subscription_url", type text}, {"commits_url", type text}, {"git_commits_url", type text}, {"comments_url", type text}, {"issue_comment_url", type text}, {"contents_url", type text}, {"compare_url", type text}, {"merges_url", type text}, {"archive_url", type text}, {"downloads_url", type text}, {"issues_url", type text}, {"pulls_url", type text}, {"milestones_url", type text}, {"notifications_url", type text}, {"labels_url", type text}, {"releases_url", type text}, {"deployments_url", type text}, {"created_at", type datetime}, {"updated_at", type datetime}, {"pushed_at", type datetime}, {"git_url", type text}, {"ssh_url", type text}, {"clone_url", type text}, {"svn_url", type text}, {"homepage", type text}, {"size", Int64.Type}, {"stargazers_count", Int64.Type}, {"watchers_count", Int64.Type}, {"language", type text}, {"has_issues", type logical}, {"has_projects", type logical}, {"has_downloads", type logical}, {"has_wiki", type logical}, {"has_pages", type logical}, {"has_discussions", type logical}, {"forks_count", Int64.Type}, {"mirror_url", type any}, {"archived", type logical}, {"disabled", type logical}, {"open_issues_count", Int64.Type}, {"license", type any}, {"allow_forking", type logical}, {"is_template", type logical}, {"web_commit_signoff_required", type logical}, {"has_pull_requests", type logical}, {"pull_request_creation_policy", type text}, {"topics", type any}, {"visibility", type text}, {"forks", Int64.Type}, {"open_issues", Int64.Type}, {"watchers", Int64.Type}, {"default_branch", type text}}),
+				    #"Outras Colunas Removidas" = Table.SelectColumns(#"Tipo Alterado",{"id", "name", "full_name", "owner.repos_url", "owner.events_url", "owner.received_events_url", "owner.type", "owner.user_view_type", "owner.site_admin", "html_url", "description", "fork", "url", "forks_url", "keys_url", "collaborators_url", "teams_url", "hooks_url", "issue_events_url", "events_url", "assignees_url", "branches_url", "tags_url", "blobs_url", "git_tags_url", "git_refs_url", "trees_url", "statuses_url", "languages_url", "stargazers_url", "contributors_url", "subscribers_url", "subscription_url", "commits_url", "git_commits_url", "comments_url", "issue_comment_url", "contents_url", "compare_url", "merges_url", "archive_url", "downloads_url", "issues_url", "pulls_url", "milestones_url", "notifications_url", "labels_url", "releases_url", "deployments_url", "created_at", "updated_at", "pushed_at", "git_url", "ssh_url", "clone_url", "svn_url", "homepage", "size", "stargazers_count", "watchers_count", "language", "has_issues", "has_projects", "has_downloads", "has_wiki", "has_pages", "has_discussions", "forks_count", "mirror_url", "archived", "disabled", "open_issues_count", "license", "allow_forking", "is_template", "web_commit_signoff_required", "has_pull_requests", "pull_request_creation_policy", "topics", "visibility", "forks", "open_issues", "watchers", "default_branch"}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Outras Colunas Removidas",{"owner.repos_url", "owner.events_url", "owner.received_events_url", "owner.type", "owner.user_view_type", "owner.site_admin"}),
+				    #"Outras Colunas Removidas1" = Table.SelectColumns(#"Colunas Removidas",{"id", "name", "full_name", "html_url", "url", "forks_url", "keys_url", "collaborators_url", "teams_url", "hooks_url", "issue_events_url", "events_url", "assignees_url", "branches_url", "tags_url", "blobs_url", "git_tags_url", "git_refs_url", "trees_url", "statuses_url", "languages_url", "stargazers_url", "contributors_url", "subscribers_url", "subscription_url", "commits_url", "git_commits_url", "comments_url", "issue_comment_url", "contents_url", "compare_url", "merges_url", "archive_url", "downloads_url", "issues_url", "pulls_url", "milestones_url", "notifications_url", "labels_url", "releases_url", "deployments_url", "created_at", "updated_at", "pushed_at", "git_url", "ssh_url", "clone_url", "svn_url", "homepage", "size", "stargazers_count", "watchers_count", "language", "has_issues", "has_projects", "has_downloads", "has_wiki", "has_pages", "has_discussions", "forks_count", "mirror_url", "archived", "disabled", "open_issues_count", "license", "allow_forking", "is_template", "web_commit_signoff_required", "has_pull_requests", "pull_request_creation_policy", "topics", "visibility", "forks", "open_issues", "watchers", "default_branch"}),
+				    #"Colunas Removidas1" = Table.RemoveColumns(#"Outras Colunas Removidas1",{"url", "forks_url", "keys_url", "collaborators_url", "teams_url", "hooks_url", "issue_events_url", "events_url", "assignees_url", "branches_url", "tags_url", "blobs_url", "git_tags_url"}),
+				    #"Outras Colunas Removidas2" = Table.SelectColumns(#"Colunas Removidas1",{"id", "name", "full_name", "html_url", "languages_url", "stargazers_url", "contributors_url", "subscribers_url", "subscription_url", "commits_url", "git_commits_url", "comments_url", "issue_comment_url", "contents_url", "compare_url", "merges_url", "archive_url", "downloads_url", "issues_url", "pulls_url", "milestones_url", "notifications_url", "labels_url", "releases_url", "deployments_url", "created_at", "updated_at", "pushed_at", "git_url", "ssh_url", "clone_url", "svn_url", "homepage", "size", "stargazers_count", "watchers_count", "language", "has_issues", "has_projects", "has_downloads", "has_wiki", "has_pages", "has_discussions", "forks_count", "mirror_url", "archived", "disabled", "open_issues_count", "license", "allow_forking", "is_template", "web_commit_signoff_required", "has_pull_requests", "pull_request_creation_policy", "topics", "visibility", "forks", "open_issues", "watchers", "default_branch"}),
+				    #"Colunas Removidas2" = Table.RemoveColumns(#"Outras Colunas Removidas2",{"languages_url", "stargazers_url", "contributors_url", "subscribers_url", "subscription_url", "commits_url", "git_commits_url", "comments_url", "issue_comment_url", "contents_url", "compare_url", "merges_url", "archive_url", "downloads_url", "issues_url", "pulls_url", "milestones_url", "notifications_url", "labels_url", "releases_url", "deployments_url", "git_url", "ssh_url", "clone_url", "svn_url", "stargazers_count", "watchers_count", "has_issues", "has_projects", "has_downloads", "has_wiki", "has_pages", "has_discussions", "forks_count", "mirror_url", "archived", "disabled", "open_issues_count", "license", "allow_forking", "is_template", "web_commit_signoff_required", "has_pull_requests", "pull_request_creation_policy", "topics", "visibility", "forks", "open_issues", "watchers", "default_branch"})
+				in
+				    #"Colunas Removidas2"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
