@@ -6,7 +6,7 @@
     "y": 712.24726378900868,
     "z": 2000,
     "height": 291.83770407400641,
-    "width": 1118.3710617661225,
+    "width": 1128.5751772931856,
     "tabOrder": 2000
   },
   "visual": {
@@ -64,23 +64,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "1455845817d2cf49af18",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Medidas"
-              }
-            },
-            "Property": "HTML Top Repositórios"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

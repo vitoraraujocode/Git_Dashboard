@@ -149,8 +149,6 @@ table Commits
 				in
 				    Expandir
 
-	changedProperty = Name
-
 	annotation PBI_NavigationStepName = Navegação
 
 	annotation PBI_ResultType = Table

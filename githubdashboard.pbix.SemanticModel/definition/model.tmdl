@@ -4,6 +4,7 @@ model Model
 	sourceQueryCulture: pt-BR
 	valueFilterBehavior: independent
 	dataAccessOptions
+		fastCombine
 		legacyRedirects
 		returnErrorValuesAsNull
 

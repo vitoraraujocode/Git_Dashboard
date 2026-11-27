@@ -98,7 +98,132 @@ table _Medidas
 			)
 		lineageTag: fd5f028f-779a-4086-8ab3-78d46c9a828a
 
-	measure 'HTML Medidas Anos' = VAR _total = COUNTROWS(Commits) VAR _minI = MINX(Commits, Commits[Ano] * 12 + VALUE(MID(Commits[data], 6, 2)) - 1) VAR _maxI = MAXX(Commits, Commits[Ano] * 12 + VALUE(MID(Commits[data], 6, 2)) - 1) VAR _serie = ADDCOLUMNS(GENERATESERIES(_minI, _maxI), "@n", VAR _i = [Value] RETURN COUNTROWS(FILTER(Commits, Commits[Ano] * 12 + VALUE(MID(Commits[data], 6, 2)) - 1 = _i)), "@mes", SWITCH(MOD([Value], 12) + 1, 1, "jan", 2, "fev", 3, "mar", 4, "abr", 5, "mai", 6, "jun", 7, "jul", 8, "ago", 9, "set", 10, "out", 11, "nov", 12, "dez"), "@ano", FORMAT(MOD(INT([Value] / 12), 100), "00")) VAR _max = MAXX(_serie, [@n]) VAR _melhor = TOPN(1, _serie, [@n], DESC, [Value], ASC) VAR _melhorTxt = MAXX(_melhor, [@mes] & "/" & [@ano]) & " (" & _max & " commits)" VAR _cols = CONCATENATEX(_serie, VAR _n = [@n] VAR _h = IF(_n = 0, 2, MAX(3, ROUND(DIVIDE(_n, _max) * 115, 0))) VAR _fundo = IF(_n = 0, "rgba(255,255,255,0.15)", IF(_n = _max, "linear-gradient(180deg,#f472b6,#a78bfa)", "linear-gradient(180deg,#22d3ee,#60a5fa)")) RETURN "<div style='flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;'>" & "<div style='font-size:10px;line-height:14px;height:14px;color:#cbd5e1;'>" & IF(_n = 0, "", _n) & "</div>" & "<div style='width:70%;max-width:22px;height:" & _h & "px;border-radius:4px 4px 0 0;background:" & _fundo & ";'></div>" & "<div style='font-size:9px;line-height:1.15;color:#94a3b8;margin-top:4px;text-align:center;white-space:nowrap;overflow:hidden;max-width:100%;'>" & [@mes] & "<br>" & [@ano] & "</div></div>", "", [Value], ASC) RETURN IF(_total = 0, "<div style='font-family:Segoe UI,Arial,sans-serif;color:#94a3b8;padding:12px;'>Sem dados para o período selecionado</div>", "<div style='width:100%;box-sizing:border-box;overflow:hidden;padding:6px 4px;font-family:Segoe UI,Arial,sans-serif;'>" & "<div style='font-size:14px;font-weight:600;color:#f8fafc;letter-spacing:0.3px;'>Commits por mês</div>" & "<div style='font-size:11px;color:#94a3b8;margin:2px 0 12px;'>Mês com mais commits: <span style='color:#f472b6;font-weight:600;'>" & _melhorTxt & "</span></div>" & "<div style='display:flex;align-items:flex-end;gap:3px;'>" & _cols & "</div></div>")
+	measure 'HTML Medidas Anos' = ```
+			
+			VAR _total =
+			    COUNTROWS(Commits)
+			
+			VAR _minI =
+			    MINX(
+			        Commits,
+			        VALUE(LEFT(Commits[data], 4)) * 12
+			            + VALUE(MID(Commits[data], 6, 2)) - 1
+			    )
+			
+			VAR _maxI =
+			    MAXX(
+			        Commits,
+			        VALUE(LEFT(Commits[data], 4)) * 12
+			            + VALUE(MID(Commits[data], 6, 2)) - 1
+			    )
+			
+			VAR _serie =
+			    ADDCOLUMNS(
+			        GENERATESERIES(_minI, _maxI),
+			        "@n",
+			            VAR _i = [Value]
+			            RETURN
+			                COUNTROWS(
+			                    FILTER(
+			                        Commits,
+			                        VALUE(LEFT(Commits[data], 4)) * 12
+			                            + VALUE(MID(Commits[data], 6, 2)) - 1 = _i
+			                    )
+			                ),
+			        "@mes",
+			            SWITCH(
+			                MOD([Value], 12) + 1,
+			                1, "jan",
+			                2, "fev",
+			                3, "mar",
+			                4, "abr",
+			                5, "mai",
+			                6, "jun",
+			                7, "jul",
+			                8, "ago",
+			                9, "set",
+			                10, "out",
+			                11, "nov",
+			                12, "dez"
+			            ),
+			        "@ano",
+			            FORMAT(
+			                INT([Value] / 12),
+			                "0000"
+			            )
+			    )
+			
+			VAR _max =
+			    MAXX(_serie, [@n])
+			
+			VAR _melhor =
+			    TOPN(
+			        1,
+			        _serie,
+			        [@n], DESC,
+			        [Value], ASC
+			    )
+			
+			VAR _melhorTxt =
+			    MAXX(
+			        _melhor,
+			        [@mes] & "/" & [@ano]
+			    ) & " (" & _max & " commits)"
+			
+			VAR _cols =
+			    CONCATENATEX(
+			        _serie,
+			        VAR _n = [@n]
+			        VAR _h =
+			            IF(
+			                _n = 0,
+			                2,
+			                MAX(3, ROUND(DIVIDE(_n, _max) * 115, 0))
+			            )
+			        VAR _fundo =
+			            IF(
+			                _n = 0,
+			                "rgba(255,255,255,0.15)",
+			                IF(
+			                    _n = _max,
+			                    "linear-gradient(180deg,#f472b6,#a78bfa)",
+			                    "linear-gradient(180deg,#22d3ee,#60a5fa)"
+			                )
+			            )
+			        RETURN
+			            "<div style='flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;'>"
+			                & "<div style='font-size:10px;line-height:14px;height:14px;color:#cbd5e1;'>"
+			                & IF(_n = 0, "", _n)
+			                & "</div>"
+			                & "<div style='width:70%;max-width:22px;height:"
+			                & _h
+			                & "px;border-radius:4px 4px 0 0;background:"
+			                & _fundo
+			                & ";'></div>"
+			                & "<div style='font-size:9px;line-height:1.15;color:#94a3b8;margin-top:4px;text-align:center;white-space:nowrap;overflow:hidden;max-width:100%;'>"
+			                & [@mes]
+			                & "<br>"
+			                & [@ano]
+			                & "</div></div>",
+			        "",
+			        [Value], ASC
+			    )
+			
+			RETURN
+			    IF(
+			        _total = 0,
+			        "<div style='font-family:Segoe UI,Arial,sans-serif;color:#94a3b8;padding:12px;'>Sem dados para o período selecionado</div>",
+			        "<div style='width:100%;box-sizing:border-box;overflow:hidden;padding:6px 4px;font-family:Segoe UI,Arial,sans-serif;'>"
+			            & "<div style='font-size:14px;font-weight:600;color:#f8fafc;letter-spacing:0.3px;'>Commits por mês</div>"
+			            & "<div style='font-size:11px;color:#94a3b8;margin:2px 0 12px;'>Mês com mais commits: <span style='color:#f472b6;font-weight:600;'>"
+			            & _melhorTxt
+			            & "</span></div>"
+			            & "<div style='display:flex;align-items:flex-end;gap:3px;'>"
+			            & _cols
+			            & "</div></div>"
+			    )
+			
+			```
 		lineageTag: d1198e3d-798c-4417-bfff-64e49ad6aa59
 
 	column Coluna

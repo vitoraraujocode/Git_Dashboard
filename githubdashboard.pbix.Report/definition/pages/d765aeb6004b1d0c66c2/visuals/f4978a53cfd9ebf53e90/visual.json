@@ -64,23 +64,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "edaa11f702a17865ecde",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Medidas"
-              }
-            },
-            "Property": "HTML Pizza Linguagens"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

@@ -76,23 +76,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "3bb6a24bc2b26c9474b8",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Medidas"
-              }
-            },
-            "Property": "HTML Cartões"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
